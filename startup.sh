@@ -1,4 +1,5 @@
 #!/bin/bas
 env
-cd /home/ubuntu/browserLiveStream
+apt-get update
+apt-get install ffmpeg -y
 node server.js
