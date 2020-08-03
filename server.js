@@ -1,10 +1,11 @@
+// Setup basic express server
 var express = require('express');
 var app = express();
+const server = require('http').createServer(app);
+
 var spawn = require('child_process').spawn;
 var fs = require('fs');
 
-app.use(express.static('public'));
-const server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 const secret_key = 'UxA54BBjUSbBAS6jPnxf';
@@ -12,6 +13,12 @@ const secret_key = 'UxA54BBjUSbBAS6jPnxf';
 spawn('ffmpeg',['-h']).on('error',function(m){
 	console.error("FFMpeg not found in system cli; please install ffmpeg properly or make a softlink to ./!");
 	process.exit(-1);
+});
+
+app.use(express.static('public'));
+
+app.get('/ping', function () {
+	res.send('pong');
 });
 
 app.post('/status', function (req, res) {
@@ -26,6 +33,9 @@ app.post('/status', function (req, res) {
 			status:	status,
 			embed:	embed
 		});
+		res.send('ok');
+	} else {
+		res.send('error');
 	}
 });
 
