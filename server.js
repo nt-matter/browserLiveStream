@@ -7,9 +7,26 @@ app.use(express.static('public'));
 const server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
+const secret_key = 'UxA54BBjUSbBAS6jPnxf';
+
 spawn('ffmpeg',['-h']).on('error',function(m){
 	console.error("FFMpeg not found in system cli; please install ffmpeg properly or make a softlink to ./!");
 	process.exit(-1);
+});
+
+app.post('/status', function (req, res) {
+	var secretKey	= req.query.secretKey;
+	var event		= req.query.event;
+	var status		= req.query.status;
+	var embed		= req.query.embed;
+
+	if (secret_key == secretKey) {
+		io.broadcast.emit('status',{
+			event:	event,
+			status:	status,
+			embed:	embed
+		});
+	}
 });
 
 io.on('connection', function(socket){
