@@ -17,7 +17,7 @@ spawn('ffmpeg',['-h']).on('error',function(m){
 
 app.use(express.static('public'));
 
-app.get('/ping', function () {
+app.get('/ping', function (req, res) {
 	res.send('pong');
 });
 
