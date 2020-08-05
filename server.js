@@ -2,13 +2,12 @@
 var express = require('express');
 var app = express();
 const server = require('http').createServer(app);
+const port = process.env.PORT || 1437;
+const secret_key = 'UxA54BBjUSbBAS6jPnxf';
 
 var spawn = require('child_process').spawn;
 var fs = require('fs');
-
 var io = require('socket.io')(server);
-
-const secret_key = 'UxA54BBjUSbBAS6jPnxf';
 
 spawn('ffmpeg',['-h']).on('error',function(m){
 	console.error("FFMpeg not found in system cli; please install ffmpeg properly or make a softlink to ./!");
@@ -22,13 +21,13 @@ app.get('/ping', function (req, res) {
 });
 
 app.post('/status', function (req, res) {
-	var secretKey	= req.query.secretKey;
+	var secretKey	= req.query.secretkey;
 	var event		= req.query.event;
 	var status		= req.query.status;
 	var embed		= req.query.embed;
 
 	if (secret_key == secretKey) {
-		io.broadcast.emit('status',{
+		io.emit('status',{
 			event:	event,
 			status:	status,
 			embed:	embed
@@ -40,10 +39,9 @@ app.post('/status', function (req, res) {
 });
 
 io.on('connection', function(socket){
-	socket.emit('message','Hello from mediarecorder-to-rtmp server!');
-	socket.emit('message','Please set rtmp destination before start streaming.');
-
 	var ffmpeg_process, feedStream=false;
+
+	socket.emit('message','Hello from mediarecorder-to-rtmp server!');
 
 	socket.on('config_rtmpDestination',function(m){
 		if(typeof m != 'string'){
@@ -69,10 +67,6 @@ io.on('connection', function(socket){
 			return;
 		}//for safety
 		socket._vcodec=m;
-	});
-
-	socket.on('ready', function(data) {
-			socket.broadcast.emit('ready',data);
 	});
 
 	socket.on('start',function(m){
@@ -106,7 +100,8 @@ io.on('connection', function(socket){
 				'-x264opts', 'keyint=30', '-crf', '25', '-pix_fmt', 'yuv420p',
 				'-profile:v', 'baseline', '-level', '3',
 				'-c:a', 'aac', '-b:a',audioEncoding, '-ar', audioBitrate,
-				'-f', 'flv', socket._rtmpDestination
+				'-f', 'flv', socket._rtmpDestination,
+				'-analyzeduration', '10M'
 			];
 		} else {
 			var ops = [
@@ -118,7 +113,8 @@ io.on('connection', function(socket){
 				'-x264opts', 'keyint=' + (frameRate * 2), '-crf', '25', '-pix_fmt', 'yuv420p',
 				'-profile:v', 'baseline', '-level', '3',
 				'-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
-				'-f', 'flv', socket._rtmpDestination
+				'-f', 'flv', socket._rtmpDestination,
+				'-analyzeduration', '10M'
 			];
 		}
 		/*. original params
@@ -147,14 +143,14 @@ io.on('connection', function(socket){
 		});
 
 		ffmpeg_process.on('error',function(e){
-			console.log('child process error' + e);
+			console.log('child process error ' + e);
 			socket.emit('fatal','ffmpeg error!' + e);
 			feedStream=false;
 			socket.disconnect();
 		});
 
 		ffmpeg_process.on('exit',function(e){
-			console.log('child process exit' + e);
+			console.log('child process exit ' + e);
 			socket.emit('fatal','ffmpeg exit!' + e);
 			socket.disconnect();
 		});
@@ -193,8 +189,8 @@ io.on('error',function(e){
 	console.log('socket.io error:' + e);
 });
 
-server.listen(1437, function(){
-	console.log('https and websocket listening on *:1437');
+server.listen(port, function(){
+	console.log('https and websocket listening on *:' + port);
 });
 
 process.on('uncaughtException', function(e) {
