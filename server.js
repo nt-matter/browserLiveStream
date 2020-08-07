@@ -91,38 +91,41 @@ io.on('connection', function(socket){
 		console.log(audioEncoding, audioBitrate);
 		console.log('framerate on node side', framerate);
 		if (framerate == 15){
+            var ops = [
+                '-i','-',
+                 '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+                '-async', '1',
+                '-filter_complex', 'aresample',
+                '-max_muxing_queue_size', '1000',
+                '-bufsize', '5000',
+                '-r', '15', '-g', '30', '-keyint_min', '30',
+                '-x264opts', 'keyint=30', '-crf', '25', '-pix_fmt', 'yuv420p',
+                '-profile:v', 'baseline', '-level', '3',
+                '-c:a', 'aac', '-b:a',audioEncoding, '-ar', audioBitrate,
+                '-f', 'flv', socket._rtmpDestination,
+                '-x264-params', 'ref=4',
+                '-movflags', '+faststart',
+                '-maxrate', '900k', '-bufsize', '900k',
+                '-vf', 'scale=640x360'
+                //'-analyzeduration', '10M'
+            ];
+        } else {
 			var ops = [
-				'-i','-',
-				 '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
-				'-max_muxing_queue_size', '1000',
-				'-bufsize', '5000',
-				'-r', '15', '-g', '30', '-keyint_min', '30',
-				'-x264opts', 'keyint=30', '-crf', '25', '-pix_fmt', 'yuv420p',
-				'-profile:v', 'baseline', '-level', '3',
-				'-c:a', 'aac', '-b:a',audioEncoding, '-ar', audioBitrate,
-				'-f', 'flv', socket._rtmpDestination,
-				'-x264-params', 'ref=4',
-				'-movflags', '+faststart',
-				'-maxrate', '900k', '-bufsize', '900k',
-				'-vf', 'scale=960x540'
-				//'-analyzeduration', '10M'
-				   
-			];
-		} else {
-			var ops = [
-				'-i','-',
-				'-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
-				'-max_muxing_queue_size', '1000',
-				'-bufsize', '5000',
-				'-r', frameRate, '-g', (frameRate * 2), '-keyint_min', (frameRate * 2),
-				'-x264opts', 'keyint=' + (frameRate * 2), '-crf', '25', '-pix_fmt', 'yuv420p',
-				'-profile:v', 'baseline', '-level', '3',
-				'-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
-				'-f', 'flv', socket._rtmpDestination,
-				'-x264-params', 'ref=4',
-				'-movflags', '+faststart',
-				'-maxrate', '900k', '-bufsize', '900k',
-				'-vf', 'scale=960x540'
+                '-i','-',
+                '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+                '-async', '1',
+                '-filter_complex', 'aresample',
+                '-max_muxing_queue_size', '1000',
+                '-bufsize', '5000',
+                '-r', '' + framerate, '-g', (framerate * 2), '-keyint_min', (framerate * 2),
+                '-x264opts', 'keyint=' + (framerate * 2), '-crf', '25', '-pix_fmt', 'yuv420p',
+                '-profile:v', 'baseline', '-level', '3',
+                '-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
+                '-f', 'flv', socket._rtmpDestination,
+                '-x264-params', 'ref=4',
+                '-movflags', '+faststart',
+                '-maxrate', '900k', '-bufsize', '900k',
+                '-vf', 'scale=640x360'
 				//'-analyzeduration', '10M'
 			];
 		}
