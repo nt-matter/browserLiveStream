@@ -87,6 +87,8 @@ io.on('connection', function(socket){
 			audioEncoding = "22k";
 		} else if (audioBitrate == 44100) {
 			audioEncoding = "44k";
+		} else if (audioBitrate == 48000) {
+		    audioEncoding = "48k";
 		}
 		console.log(audioEncoding, audioBitrate);
 		console.log('framerate on node side', framerate);
@@ -95,7 +97,7 @@ io.on('connection', function(socket){
                 '-i','-',
                  '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
                 '-async', '1',
-                '-filter_complex', 'aresample',
+                '-filter_complex', 'aresample='+audioBitrate,
                 '-max_muxing_queue_size', '1000',
                 '-r', '15', '-g', '30', '-keyint_min', '1',
                 '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
@@ -104,7 +106,7 @@ io.on('connection', function(socket){
                 '-f', 'flv', socket._rtmpDestination,
                 '-x264-params', 'ref=4',
                 '-movflags', '+faststart',
-                '-vf', 'scale=640x360'
+                //'-vf', 'scale=640x360'
                 //'-analyzeduration', '10M'
             ];
         } else {
@@ -112,7 +114,7 @@ io.on('connection', function(socket){
                 '-i','-',
                 '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
                 '-async', '1',
-                '-filter_complex', 'aresample',
+                '-filter_complex', 'aresample='+audioBitrate,
                 '-max_muxing_queue_size', '1000',
                 '-r', '' + framerate, '-g', (framerate * 2), '-keyint_min', '1',
                 '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
@@ -121,7 +123,7 @@ io.on('connection', function(socket){
                 '-f', 'flv', socket._rtmpDestination,
                 '-x264-params', 'ref=4',
                 '-movflags', '+faststart',
-                '-vf', 'scale=640x360'
+                //'-vf', 'scale=640x360'
 				//'-analyzeduration', '10M'
 			];
 		}
