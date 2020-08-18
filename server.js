@@ -88,21 +88,22 @@ io.on('connection', function(socket){
 		} else if (audioBitrate == 44100) {
 			audioEncoding = "44k";
 		} else if (audioBitrate == 48000) {
+			audioEncoding = "320k";
+		} else if (audioBitrate == 48000) {
 		    audioEncoding = "48k";
 		}
 		console.log(audioEncoding, audioBitrate);
 		console.log('framerate on node side', framerate);
 		if (framerate == 15){
             var ops = [
-                '-i','-',
-                 '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
-                '-async', '1',
-                '-filter_complex', 'aresample='+audioBitrate,
+                '-i', '-',
+                '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+                '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
                 '-r', '15', '-g', '30', '-keyint_min', '1',
                 '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
                 '-profile:v', 'baseline', '-level', '3',
-                '-c:a', 'aac', '-b:a',audioEncoding, '-ar', audioBitrate,
+                '-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
                 '-f', 'flv', socket._rtmpDestination,
                 '-x264-params', 'ref=4',
                 '-movflags', '+faststart',
@@ -111,11 +112,11 @@ io.on('connection', function(socket){
             ];
         } else {
 			var ops = [
-                '-i','-',
+                '-i', '-',
                 '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
-                '-async', '1',
-                '-filter_complex', 'aresample='+audioBitrate,
+                '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
+		//'-b:v', '2M', '-maxrate', '2M', '-bufsize', '1M',
                 '-r', '' + framerate, '-g', (framerate * 2), '-keyint_min', '1',
                 '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
                 '-profile:v', 'baseline', '-level', '3',
