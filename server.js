@@ -97,11 +97,12 @@ io.on('connection', function(socket){
 		if (framerate == 15){
             var ops = [
                 '-i', '-',
-                '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+                '-c:v', 'libx264', '-preset', 'fast', '-tune', 'zerolatency',
                 '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
+                '-bufsize', '5M',
                 '-r', '15', '-g', '30', '-keyint_min', '1',
-                '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
+                '-x264opts', 'keyint=1', '-crf', '10', '-pix_fmt', 'yuv420p',
                 '-profile:v', 'baseline', '-level', '3',
                 '-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
                 '-f', 'flv', socket._rtmpDestination,
@@ -113,12 +114,13 @@ io.on('connection', function(socket){
         } else {
 			var ops = [
                 '-i', '-',
-                '-c:v', 'libx264', '-preset', 'ultrafast', '-tune', 'zerolatency',
+                '-c:v', 'libx264', '-preset', 'fast', '-tune', 'zerolatency',
                 '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
-		//'-b:v', '2M', '-maxrate', '2M', '-bufsize', '1M',
+                '-bufsize', '5M',
+				//'-b:v', '2M', '-maxrate', '2M', 
                 '-r', '' + framerate, '-g', (framerate * 2), '-keyint_min', '1',
-                '-x264opts', 'keyint=1', '-crf', '25', '-pix_fmt', 'yuv420p',
+                '-x264opts', 'keyint=1', '-crf', '10', '-pix_fmt', 'yuv420p',
                 '-profile:v', 'baseline', '-level', '3',
                 '-c:a', 'aac', '-b:a', audioEncoding, '-ar', audioBitrate,
                 '-f', 'flv', socket._rtmpDestination,
