@@ -97,7 +97,7 @@ io.on('connection', function(socket){
 		if (framerate == 15){
             var ops = [
                 '-i', '-',
-                '-c:v', 'libx264', '-preset', 'fast', '-tune', 'zerolatency',
+                '-c:v', 'libx264', '-preset', 'veryfast', '-tune', 'zerolatency',
                 '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
                 '-bufsize', '5M',
@@ -114,7 +114,7 @@ io.on('connection', function(socket){
         } else {
 			var ops = [
                 '-i', '-',
-                '-c:v', 'libx264', '-preset', 'fast', '-tune', 'zerolatency',
+                '-c:v', 'libx264', '-preset', 'veryfast', '-tune', 'zerolatency',
                 '-filter_complex', 'aresample',
                 '-max_muxing_queue_size', '1000',
                 '-bufsize', '5M',
